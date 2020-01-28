@@ -1,4 +1,4 @@
-# H1 k3s cluster on raspberry pi with Ansible.
+# k3s cluster on raspberry pi with Ansible.
 
 This project is based on these two projects:
 - https://blog.alexellis.io/test-drive-k3s-on-raspberry-pi/
@@ -7,21 +7,21 @@ This project is based on these two projects:
 Their code and explanations are better than mines ;)
 
 
-# H2 What is k3s? 
+## What is k3s? 
 
 [K3s](https://k3s.io/) is a lightweight implementation of kubernetes' API. Small binary easy to install and deploy. That makes it ideal for using it on a Raspberry pi.
 
-# H3 Motivation:
+### Motivation:
 
 Learning about Ansible, Kubernetes and K3s.
 
-# Hardware: (TODO)
+### Hardware: (TODO)
 
 4 x Raspberry pi model 4 4G
 4 x 32G Micro SD cards
 
 
-# H3 Setup:
+### Setup:
 
 Configuration k3s cluster:
 - 1 master node
@@ -30,7 +30,7 @@ Configuration k3s cluster:
 The first node is by far the most critical. We use the first node's wireless connection to provide internet access to the rest of the nodes (I'll have to add a cache) and use it as jump host in ansible.
 
 
-# Steps
+### Steps
 
 Download Raspbian Buster Lite from [repo](https://www.raspberrypi.org/downloads/raspbian/)
 
@@ -91,7 +91,7 @@ gpu_mem=16
 ```
 
 
-# H3 TO BE CONTINUED...
+# TO BE CONTINUED...
 
 References:
 https://www.raspberrypi.org/documentation/installation/installing-images/linux.md
