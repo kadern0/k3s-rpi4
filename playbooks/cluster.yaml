@@ -1,0 +1,51 @@
+---
+- hosts: master
+  tasks:
+    - name: Installing k3s on master
+      shell:
+        cmd: curl -sfL https://get.k3s.io | sh -
+      become: true
+    - name: Get k3s token
+      command: cat /var/lib/rancher/k3s/server/node-token
+      register: k3s_token
+      become: true 
+    - name: Get credentials
+      command: cat /etc/rancher/k3s/k3s.yaml
+      register: k3s_password
+      become: true
+    - debug:
+        msg: "Default password is {{ k3s_password }}"
+- hosts: k8s_workers
+  vars:
+    K3S_URL: "https://{{ hostvars['master']['ansible_eth0']['ipv4']['address'] }}:6443"
+    K3S_TOKEN: "{{ hostvars['master']['k3s_token']['stdout_lines'][0]}}"
+  tasks:
+    - name: Installing k3s on worker nodes
+      shell:
+        cmd: "curl -sfL https://get.k3s.io | K3S_URL={{ K3S_URL }} K3S_TOKEN={{ K3S_TOKEN }} sh -"
+      become: true
+
+    - debug:
+        msg: " {{ K3S_URL }}"
+    - debug:
+        msg: " {{ K3S_TOKEN }}"
+
+
+#     $ export K3S_URL="https://192.168.0.32:6443"
+
+# $ export K3S_TOKEN="K1089729d4ab5e51a44b1871768c7c04ad80bc6319d7bef5d94c7caaf9b0bd29efc::node:1fcdc14840494f3ebdcad635c7b7a9b7"
+
+
+# var=hostvars['master']['k3s_token']
+# {{ hostvars[groups['rpi_k8s_master'][0]]['rpi_k8_static_ip_addr'] }}"
+
+
+
+# "{{ ansible_enp0s3.ipv4.address }}"
+
+# hostvars['master']['ansible_eth0']['ipv4']['address']
+#   tasks:
+#     - name: This command will change the working directory to somedir/.
+#       shell:
+#         cmd: curl -sfL https://get.k3s.io | sh -
+#       become: true

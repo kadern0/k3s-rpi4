@@ -1,0 +1,101 @@
+---
+- hosts: jumphost
+  handlers:
+    - name: restart dhcpcd
+      service:
+        name: dhcpcd
+        state: restarted
+    - name: restart dnsmasq
+      service:
+        name: dnsmasq
+        state: restarted
+
+  tasks:
+    - name: Updating APT Cache
+      apt:
+      become: true
+
+    - name: Installing iptables-persistent
+      apt:
+        name: iptables-persistent
+        state: present
+      become: true
+
+    - name: Ensuring netfilter-persistent Is Enabled and Starts On Reboot
+      service:
+        name: netfilter-persistent
+        enabled: true
+      become: true
+    - name: Enabling NAT
+      iptables:
+        table: nat
+        chain: POSTROUTING
+        out_interface: wlan0
+        jump: MASQUERADE
+      become: yes
+      register: _iptables_configured
+    - name: Allow related and established connections
+      iptables:
+        chain: FORWARD
+        in_interface: wlan0
+        out_interface: eth0
+        ctstate: ESTABLISHED,RELATED
+        jump: ACCEPT
+      become: yes
+      register: _iptables_configured
+    - name: Forward packets from eth0 to wlan0
+      iptables:
+        chain: FORWARD
+        in_interface: eth0
+        out_interface: wlan0
+        jump: ACCEPT
+      become: yes
+      register: _iptables_configured
+
+    - name: Saving iptables rules
+      command: service netfilter-persistent save
+      become: true
+      tags:
+        - iptables-config
+      when: _iptables_configured['changed']
+
+    - name: Installing dnsmasq
+      apt:
+        name: dnsmasq
+        state: present
+      become: true
+
+
+    - name: Updating /etc/dhcpcd.conf
+      template:
+        src: templates/dhcpcd.conf.j2
+        dest: /etc/dhcpcd.conf
+      become: true
+      notify: restart dhcpcd
+
+    - name: Setting Up IP Forwarding On Primary
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: 1
+      become: true
+
+    # - name: Updating /etc/hosts
+    #   template:
+    #     src: templates/hosts.j2
+    #     dest: /etc/hosts
+    #   become: true
+
+    - name: Updating /etc/dnsmasq.conf
+      template:
+        src: templates/dnsmasq.j2
+        dest: /etc/dnsmasq.conf
+      become: true
+      notify: restart dnsmasq
+
+    - name: Adding Local User SSH Key
+      authorized_key:
+        user: pi
+        state: present
+        key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+      become: true
+

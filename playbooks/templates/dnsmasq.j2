@@ -1,0 +1,17 @@
+{{ ansible_managed|comment }}
+
+# Set the interface on which dnsmasq operates.
+# If not set, all the interfaces is used.
+
+interface=eth0
+listen-address=10.0.0.101
+bind-interfaces
+server=8.8.8.8
+
+dhcp-range=10.0.0.102,10.0.0.104,255.255.255.0,12h
+
+# Logging.
+log-facility=/var/log/dnsmasq.log   # logfile path.
+log-async
+log-queries # log queries.
+log-dhcp    # log dhcp related messages.

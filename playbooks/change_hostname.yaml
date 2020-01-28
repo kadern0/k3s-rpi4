@@ -1,0 +1,52 @@
+
+---
+
+- hosts: master
+  roles:
+    - role: mrlesmithjr.change-hostname
+  tasks:
+    - name: Updating /etc/hosts
+      template:
+        src: templates/hosts.j2
+        dest: /etc/hosts
+      become: true
+      register: _hosts_config
+
+    - name: Restarting Host
+      shell: sleep 2 && shutdown -r now "rebooting to complete hostname change"
+      async: 1
+      poll: 0
+      ignore_errors: true
+      become: true
+      register: _restarting_host
+      when: _hosts_config['changed']
+
+    - name: Waiting For Host To Respond
+      wait_for_connection:
+        delay: 20
+      when: _restarting_host['changed']
+
+- hosts: k8s_workers
+  roles:
+    - role: mrlesmithjr.change-hostname
+  tasks:
+    - name: Updating /etc/hosts
+      template:
+        src: templates/hosts.j2
+        dest: /etc/hosts
+      become: true
+      register: _hosts_config
+
+    - name: Restarting Host
+      shell: sleep 2 && shutdown -r now "rebooting to complete hostname change"
+      async: 1
+      poll: 0
+      ignore_errors: true
+      become: true
+      register: _restarting_host
+      when: _hosts_config['changed']
+
+    - name: Waiting For Host To Respond
+      wait_for_connection:
+        delay: 20
+      when: _restarting_host['changed']

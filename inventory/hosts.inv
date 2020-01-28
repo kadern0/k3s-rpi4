@@ -1,0 +1,8 @@
+[k8s_master]
+master ansible_host=10.0.0.101
+[k8s_workers]
+worker-2 ansible_host=10.0.0.102
+worker-3 ansible_host=10.0.0.103
+worker-4 ansible_host=10.0.0.104
+[jumphost]
+jumphost ansible_host=192.168.0.106

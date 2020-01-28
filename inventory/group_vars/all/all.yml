@@ -1,0 +1,19 @@
+---
+ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q pi@192.168.0.106"'
+
+pri_domain_name: k3s.internal
+
+# Defines if GlusterFS should be used for persistent storage capabilities
+#rpi_k8s_use_glusterfs: true
+
+# Defines the default rpi password for the rpi_username...default is raspberry
+rpi_password: raspberry
+
+# Defines the default rpi username...default is pi
+rpi_username: pi
+
+# Defines rpi wired interface name
+rpi_wired_int: eth0
+
+# Defines rpi wireless interface name
+rpi_wireless_int: wlan0
