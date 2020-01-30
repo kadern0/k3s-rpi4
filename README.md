@@ -142,7 +142,22 @@ Install and configure the k3s cluster:
 ansible-playbook playbooks/cluster.yml
 ```
 
-Now you need to configure your kubectl to access this cluster. The configuration is available at **/etc/rancher/k3s/k3s.yaml** in the master node. Add it to your **~/.kube/config** file and don't forget to update the cluster ip address (same as the jumphost). Now you can start using your fresh installed cluster:
+Now you need to configure your kubectl to access this cluster. The configuration is available at **/etc/rancher/k3s/k3s.yaml** in the master node. Add it to your **~/.kube/config** file and don't forget to update the cluster ip address (same as the jumphost) or alternatively, get from this file the username and password and run the following commands:
+
+``` bash
+kubectl config set-credentials admin/k3s.local --username=your_username_most_likely_is_admin --password=the_password_from_k3s.yaml_file_on_master
+User "admin/k3s.local" set.
+kubectl config set-cluster k3s.local --insecure-skip-tls-verify=true --server=https://your_jumphost_ip_address
+Cluster "k3s.local" set.
+kubectl config set-context default/k3s.local/admin --user=admin/k3s.local --namespace=default --cluster=k3s.local
+Context "default/k3s.local/admin" created.
+kubectl config use-context default/k3s.local/admin
+Switched to context "default/k3s.local/admin".
+kubectl config set-cluster k3s.local --insecure-skip-tls-verify=true --server=https://your_jumphost_ip_address:6443
+Cluster "k3s.local" set.
+```
+
+Now you can start using your fresh installed cluster:
 
 
 ``` bash
