@@ -30,22 +30,3 @@
     - debug:
         msg: " {{ K3S_TOKEN }}"
 
-
-#     $ export K3S_URL="https://192.168.0.32:6443"
-
-# $ export K3S_TOKEN="K1089729d4ab5e51a44b1871768c7c04ad80bc6319d7bef5d94c7caaf9b0bd29efc::node:1fcdc14840494f3ebdcad635c7b7a9b7"
-
-
-# var=hostvars['master']['k3s_token']
-# {{ hostvars[groups['rpi_k8s_master'][0]]['rpi_k8_static_ip_addr'] }}"
-
-
-
-# "{{ ansible_enp0s3.ipv4.address }}"
-
-# hostvars['master']['ansible_eth0']['ipv4']['address']
-#   tasks:
-#     - name: This command will change the working directory to somedir/.
-#       shell:
-#         cmd: curl -sfL https://get.k3s.io | sh -
-#       become: true
