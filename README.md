@@ -16,7 +16,7 @@ Their code and explanations are better than mines ;)
 Learning about Ansible, Kubernetes and K3s.
 
 ### Hardware: (TODO)
-
+![cluster](cluster.jpg)
 4 x Raspberry pi model 4 4G
 4 x 32G Micro SD cards
 
@@ -68,10 +68,28 @@ Mounted /dev/mmcblk0p1 at /media/kaderno/boot.
 udisksctl mount -b /dev/mmcblk0p2
 Mounted /dev/mmcblk0p2 at /media/kaderno/rootfs.
 ```
+Setting up wifi connection:
+``` bash
+vi /media/kaderno/boot/wpa_supplicant.conf
+```
+``` bash
+wpa_supplicant.conf:
+```
+``` bash
+country=US
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+
+network={
+    ssid="your_real_wifi_ssid"
+    scan_ssid=1
+    psk="your_real_password"
+    key_mgmt=WPA-PSK
+}
+```
 Enabling SSH, setting up wifi connection and adding my ssh keys:
 ``` bash
 touch /media/kaderno/boot/ssh
-vi /media/kaderno/boot/wpa_supplicant.conf
 sudo  mkdir -m 700 /media/kaderno/rootfs/home/pi/.ssh
 sudo cp ~/.ssh/id_rsa.pub /media/kaderno/rootfs/home/pi/.ssh/authorized_keys
 sudo chown -R 1000:1000 /media/kaderno/rootfs/home/pi/.ssh/
