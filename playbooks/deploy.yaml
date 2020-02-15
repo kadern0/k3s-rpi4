@@ -1,0 +1,9 @@
+---
+- name: Provisioning master node
+  import_playbook: master.yaml
+
+- name: Setting Up Hostnames
+  import_playbook: change_hostname.yaml
+
+- name: Provisioning K3s Cluster
+  import_playbook: cluster.yaml

@@ -1,32 +1,29 @@
 ---
 - hosts: master
   tasks:
-    - name: Installing k3s on master
+    - openssh_keypair:
+        path: /home/pi/.ssh/id_rsa
+    - name: fetch public ssh keys
       shell:
-        cmd: curl -sfL https://get.k3s.io | sh -
-      become: true
-    - name: Get k3s token
-      command: cat /var/lib/rancher/k3s/server/node-token
-      register: k3s_token
-      become: true 
-    - name: Get credentials
-      command: cat /etc/rancher/k3s/k3s.yaml
-      register: k3s_password
-      become: true
-    - debug:
-        msg: "Default password is {{ k3s_password }}"
-- hosts: k8s_workers
-  vars:
-    K3S_URL: "https://{{ hostvars['master']['ansible_eth0']['ipv4']['address'] }}:6443"
-    K3S_TOKEN: "{{ hostvars['master']['k3s_token']['stdout_lines'][0]}}"
+        cmd: cat ~/.ssh/id_rsa.pub
+      register: ssh_key
+    - name: check key
+      debug: msg="{{ ssh_key.stdout }}"
+- hosts: master:k8s_workers
   tasks:
-    - name: Installing k3s on worker nodes
+  - name: Deploying ssh key
+    authorized_key: user=pi key="{{ item }}"
+    with_items: "{{ hostvars['master']['ssh_key'].stdout }}"
+- hosts: master
+  tasks:
+    - name: Installing k3sup
       shell:
-        cmd: "curl -sfL https://get.k3s.io | K3S_URL={{ K3S_URL }} K3S_TOKEN={{ K3S_TOKEN }} sh -"
+        cmd: "curl -sLS https://get.k3sup.dev | sh"
       become: true
-
-    - debug:
-        msg: " {{ K3S_URL }}"
-    - debug:
-        msg: " {{ K3S_TOKEN }}"
-
+    - name: Installing k3s on master
+      command: "k3sup install --ip {{  ansible_eth0.ipv4.address }} --user pi --ssh-key /home/pi/.ssh/id_rsa"
+      become: true
+    - name: Installing k3s on workers and joining master
+      command: "k3sup join --server-ip {{  ansible_eth0.ipv4.address }} --ip {{ hostvars[item]['ansible_eth0']['ipv4']['address'] }} --user pi --ssh-key /home/pi/.ssh/id_rsa"
+      become: true       
+      with_items: "{{ groups['k8s_workers'] }}"
